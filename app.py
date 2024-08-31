@@ -20,9 +20,14 @@ def init():
 def init_deviceMode():
     user_agent = st_javascript("window.navigator.userAgent")
     #Javascript library has loading time
+    timeout = 60  # seconds
+    start_time = time.time()
     while True:
         if isinstance(user_agent, str):
             st.session_state.device_mode = "mobile" if "Mobi" in user_agent else "desktop"
+            break
+        elif time.time() - start_time > timeout:
+            st.write("Timeout feching javascript data reached; exiting loop.")
             break
         else:
             time.sleep(0.01)

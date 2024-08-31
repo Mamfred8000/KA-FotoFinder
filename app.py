@@ -2,7 +2,6 @@ import streamlit as st
 #import pandas as pd
 #import numpy as np
 import folium
-import time
 from streamlit_folium import st_folium
 from streamlit import runtime
 from streamlit.runtime.scriptrunner import get_script_run_ctx

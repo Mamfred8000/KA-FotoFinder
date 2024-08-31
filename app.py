@@ -1,3 +1,4 @@
+import time
 import streamlit as st
 #import pandas as pd
 #import numpy as np
@@ -18,19 +19,18 @@ def init():
 
 def init_deviceMode():
     user_agent = st_javascript("window.navigator.userAgent")
-    #st.session_state.device_mode = "mobile" if "Mobi" in user_agent else "desktop"
-    if isinstance(user_agent, str):
-        st.session_state.device_mode = "mobile" if "Mobi" in user_agent else "desktop"
-    else:
-        st.session_state.device_mode = "desktop"  # Default to desktop if user_agent is not a string
+    #Javascript library has loading time
+    while True:
+        if isinstance(user_agent, str):
+            st.session_state.device_mode = "mobile" if "Mobi" in user_agent else "desktop"
+            break
+        else:
+            time.sleep(0.01)
 
 # Karte erzeugen
 def generate_map():
     """Karte mit Marker erzeugen. Lese Position aus session state"""
-    if st.session_state.device_mode == "desktop":
-        width, height = 700, 500
-    else:
-        width, height = 300, 400
+    width, height = (300, 400) if st.session_state.device_mode == "mobile" else (700, 500)
     location = st.session_state.marker_pos
     zoom = st.session_state.zoom
     map_obj = folium.Map(location=location, zoom_start=zoom)

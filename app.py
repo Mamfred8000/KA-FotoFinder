@@ -22,7 +22,7 @@ def generate_map():
     if st.session_state.device_mode == "desktop":
         width, height = 700, 500
     else:
-        width, height = 300, 300
+        width, height = 300, 400
     location = st.session_state.marker_pos
     zoom = st.session_state.zoom
     map_obj = folium.Map(location=location, zoom_start=zoom)
@@ -42,19 +42,6 @@ def get_params():
 def button_func():
     st.session_state.counter += 1
     st.session_state.guess_position = st.session_state.marker_pos
-
-def get_remote_ip() -> str:
-    """Get remote ip."""
-    try:
-        ctx = get_script_run_ctx()
-        if ctx is None:
-            return None
-        session_info = runtime.get_instance().get_client(ctx.session_id)
-        if session_info is None:
-            return None
-    except Exception as e:
-        return None
-    return session_info.request.remote_ip
 
 # Hauptfunktion
 def main():
@@ -80,11 +67,12 @@ def main():
     # Output für Entwicklung
     st.write(f"Marker Position: Latitude: {st.session_state.marker_pos[0]}, Longitude: {st.session_state.marker_pos[1]}, Foto: {photo_id}")
     st.write(f"Button Click Counter: {st.session_state.counter}, Guess Position: {st.session_state.guess_position}")
-    st.write(f"The remote ip is {get_remote_ip()}")
     st.write(f"Device mode: {st.session_state.device_mode}")
 
 
 if __name__ == "__main__":
-    st.session_state.device_mode = "mobile" if "Mobi" in st_javascript("window.navigator.userAgent") else "desktop"
+    user_agent = st_javascript("window.navigator.userAgent")
+    st.session_state.device_mode = "mobile" if "Mobi" in user_agent else "desktop"
+    st.write(f"User Agent: {user_agent}")
     if 'init_flag' not in st.session_state: init()
     main()

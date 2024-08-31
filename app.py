@@ -1,10 +1,11 @@
 import streamlit as st
-import pandas as pd
-import numpy as np
+#import pandas as pd
+#import numpy as np
 import folium
 from streamlit_folium import st_folium
 from streamlit import runtime
 from streamlit.runtime.scriptrunner import get_script_run_ctx
+from streamlit_javascript import st_javascript
 
 # Initialisieren
 def init():
@@ -14,15 +15,24 @@ def init():
     st.session_state.zoom = 13
     st.session_state.counter = 1
     st.session_state.guess_position = [0, 0]
+    st.session_state.screen_width = st.get_option("theme.element_width") if "theme.element_width" in st.session_state else 999
+
+def define_mapsize():
+    if st.session_state.screen_width < 768:  # For mobile screens
+        map_width, map_height = st.session_state.screen_width - 40, 300
+    else:  # For larger screens
+        map_width, map_height = 700, 500
+    return map_width, map_height
 
 # Karte erzeugen
 def generate_map():
-    """Karte mit Marker erzeugen. Lese Position aus session state"""    
+    """Karte mit Marker erzeugen. Lese Position aus session state"""
+    width, height = define_mapsize()
     location = st.session_state.marker_pos
     zoom = st.session_state.zoom
     map_obj = folium.Map(location=location, zoom_start=zoom)
     folium.Marker(location=location, tooltip="Marker Position").add_to(map_obj)
-    map_output = st_folium(map_obj, width=700, height=500)
+    map_output = st_folium(map_obj, width=width, height=height)
     return map_output
 
 # Query Parameter lesen
@@ -76,6 +86,19 @@ def main():
     st.write(f"Marker Position: Latitude: {st.session_state.marker_pos[0]}, Longitude: {st.session_state.marker_pos[1]}, Foto: {photo_id}")
     st.write(f"Button Click Counter: {st.session_state.counter}, Guess Position: {st.session_state.guess_position}")
     st.write(f"The remote ip is {get_remote_ip()}")
+    
+    #######
+    user_agent = st_javascript("window.navigator.userAgent")
+
+    # Check if the user agent indicates a mobile device
+    if "Mobi" in user_agent:
+        st.write("You are using a mobile device.")
+    else:
+        st.write("You are using a desktop device.")
+
+    # Optionally, display the user agent string
+    st.write(f"User Agent: {user_agent}")
+
 
 if __name__ == "__main__":
     if 'init_flag' not in st.session_state: init()

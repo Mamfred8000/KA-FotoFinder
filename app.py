@@ -2,6 +2,7 @@ import streamlit as st
 #import pandas as pd
 #import numpy as np
 import folium
+import time
 from streamlit_folium import st_folium
 from streamlit import runtime
 from streamlit.runtime.scriptrunner import get_script_run_ctx
@@ -15,6 +16,14 @@ def init():
     st.session_state.zoom = 13
     st.session_state.counter = 1
     st.session_state.guess_position = [0, 0]
+
+def init_deviceMode():
+    user_agent = st_javascript("window.navigator.userAgent")
+    #st.session_state.device_mode = "mobile" if "Mobi" in user_agent else "desktop"
+    if isinstance(user_agent, str):
+        st.session_state.device_mode = "mobile" if "Mobi" in user_agent else "desktop"
+    else:
+        st.session_state.device_mode = "desktop"  # Default to desktop if user_agent is not a string
 
 # Karte erzeugen
 def generate_map():
@@ -71,8 +80,7 @@ def main():
 
 
 if __name__ == "__main__":
-    user_agent = st_javascript("window.navigator.userAgent")
-    st.session_state.device_mode = "mobile" if "Mobi" in user_agent else "desktop"
-    st.write(f"User Agent: {user_agent}")
-    if 'init_flag' not in st.session_state: init()
+    if 'init_flag' not in st.session_state:
+        init_deviceMode()
+        init()
     main()

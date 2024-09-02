@@ -58,6 +58,7 @@ def button_func():
 
 # Hauptfunktion
 def main():
+    showSidebarNavigation = false
     st.title("KA-FotoFinder")
     col1, col2 = st.columns(spec=[0.7, 0.3])
     with col1:
@@ -82,6 +83,8 @@ def main():
     st.write(f"Button Click Counter: {st.session_state.counter}, Guess Position: {st.session_state.guess_position}")
     st.write(f"Device mode: {st.session_state.device_mode}")
 
+    if st.button("Quiz"):
+        st.switch_page("pages/1_quiz.py")
 
 if __name__ == "__main__":
     if 'init_flag' not in st.session_state:

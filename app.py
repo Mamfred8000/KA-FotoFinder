@@ -27,14 +27,18 @@ def get_photo_param():
         photo_id = 'nA'
     return photo_id
 
+def get_photo_position():
+    pos = [48.99511114804374, 8.402958512306215]
+    return pos
+
 def init():
     st.session_state.init_flag = True
     st.session_state.user_name = ""
     st.session_state.marker_pos = [49.01357217893837, 8.404385447502138]
     st.session_state.zoom = 13
-    st.session_state.counter = 1
     st.session_state.guess_position = [0, 0]
     st.session_state.photo_id = get_photo_param()
+    st.session_state.photo_position = get_photo_position()
 
 # Hauptfunktion
 def main():
@@ -57,3 +61,6 @@ if __name__ == "__main__":
         init_deviceMode()
         init()
         st.rerun()
+
+# Output für Entwicklung
+st.write(st.session_state)

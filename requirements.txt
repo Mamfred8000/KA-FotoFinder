@@ -6,4 +6,4 @@ streamlit-folium
 streamlit_javascript
 geopy
 sqlalchemy
-psycopg2
+psycopg2-binary

@@ -5,4 +5,4 @@ folium
 streamlit-folium
 streamlit_javascript
 geopy
-psycopg2
+sqlalchemy

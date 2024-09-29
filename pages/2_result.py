@@ -66,10 +66,18 @@ def generate_map_new():
     
     return map_output
 
+def calculate_rank():
+    st.session_state.rank = 1
+
 def main():
     st.title("result")
     
     calculate_distance()
+    calculate_rank()
+
+    st.markdown(f"<h2 style='text-align: center;'>{st.session_state.distance:.0f}m</h2>", unsafe_allow_html=True)
+    st.markdown(f"<p style='text-align: center;'>Super, {st.session_state.rank}. Platz für dich!</p>", unsafe_allow_html=True)
+
     map_obj = generate_map_new()
 
     st.write(f"Geratene Position: {st.session_state.guess_position}")

@@ -3,7 +3,7 @@
 
 #secrets
 secrets.toml
-database.py
+xx_database.py
 
 ### Python ###
 # Byte-compiled / optimized / DLL files

@@ -1,16 +1,9 @@
 import streamlit as st
 import folium
 from streamlit_folium import st_folium
-from geopy.distance import geodesic
-
-def calculate_distance():
-    guess = st.session_state.guess_position
-    goal = st.session_state.photo_position
-    st.session_state.distance = geodesic(guess, goal).meters
-    return True
 
 def generate_map_new():
-    """Karte mit Marker erzeugen nach der neuen Methode. Die Hoffnung war, dadurch eine dynamische Karte ohne Rerendern zu erzeugen."""
+    """Karsste mit Marker erzeugen nach der neuen Methode. Die Hoffnung war, dadurch eine dynamische Karte ohne Rerendern zu erzeugen."""
     width, height = (300, 400) if st.session_state.device_mode == "mobile" else (700, 500)
 
     # Get the two locations
@@ -70,19 +63,14 @@ def calculate_rank():
     st.session_state.rank = 1
 
 def main():
-    st.title("result")
+    #st.title("result")
     
-    calculate_distance()
     calculate_rank()
 
     st.markdown(f"<h2 style='text-align: center;'>{st.session_state.distance:.0f}m</h2>", unsafe_allow_html=True)
     st.markdown(f"<p style='text-align: center;'>Super, {st.session_state.rank}. Platz für dich!</p>", unsafe_allow_html=True)
 
     map_obj = generate_map_new()
-
-    st.write(f"Geratene Position: {st.session_state.guess_position}")
-    st.write(f"Ziel Position: {st.session_state.photo_position}")
-    st.write(f"Distanz: {st.session_state.distance:.0f} m")
 
 ##main
 if 'init_flag' in st.session_state:
@@ -91,4 +79,4 @@ else:
     st.write("Initialization failed. Read QR-Code to resume.")
 
 # Output für Entwicklung
-st.write(st.session_state)
+#st.write(st.session_state)

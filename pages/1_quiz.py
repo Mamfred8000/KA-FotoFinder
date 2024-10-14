@@ -1,6 +1,11 @@
 import streamlit as st
 import folium
 from streamlit_folium import st_folium
+from geopy.distance import geodesic
+
+from datetime import date
+from sqlalchemy import text
+import time
 
 # Karte erzeugen
 def generate_map():
@@ -41,8 +46,36 @@ def generate_map_new():
     
     return map_output
 
+def calculate_distance():
+    guess = st.session_state.guess_position
+    goal = st.session_state.photo_position
+    st.session_state.distance = geodesic(guess, goal).meters
+    return True
+
+def insert_data(username, timestamp, distance, photo_id):
+    #conn = st.connection("postgresql", type="sql")
+    
+    insert_query = text(
+        'INSERT INTO "KAFotoFinder-Scoreboard" (username, timestamp, distance, photo_id) '
+        'VALUES (:username, :timestamp, :distance, :photo_id)'
+    )
+    
+    # Execute the insert query with a progress spinner
+    with st.spinner('Warum auch immer ist die Datenbank Latenz relativ hoch...'):
+        with st.session_state.conn.session as s:
+            s.execute(insert_query, {
+                'username': username,
+                'timestamp': timestamp,
+                'distance': distance,
+                'photo_id': photo_id
+            })
+            s.commit()
+            #time.sleep(4)  #Latency of database is 1-4 seconds
+    
+    st.success("Data inserted successfully!")
+
 def main():
-    st.title("quiz")
+    #st.title("quiz")
     st.write("### Ort auswählen und bestätigen")
 
     # Karte Initial erstellen
@@ -56,6 +89,13 @@ def main():
 
     if st.button("Abschicken", type="primary"):
         st.session_state.guess_position = st.session_state.marker_pos
+        calculate_distance()
+        insert_data(
+            st.session_state.user_name,
+            date.today(),
+            st.session_state.distance,
+            st.session_state.photo_id
+        )
         st.switch_page("pages/2_result.py")
 
 ##main
@@ -65,4 +105,4 @@ else:
     st.write("Initialization failed. Read QR-Code to resume.")
 
 # Output für Entwicklung
-st.write(st.session_state)
+#st.write(st.session_state)

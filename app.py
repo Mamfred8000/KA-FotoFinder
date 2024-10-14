@@ -31,6 +31,13 @@ def get_photo_position():
     pos = [48.99511114804374, 8.402958512306215]
     return pos
 
+def read_photo_position():
+    df = st.session_state.conn.query('SELECT * FROM "photo-list";')
+    st.write(df)
+    lat = df.loc[df['photo_id'] == st.session_state.photo_id, 'latitude'].values[0]
+    long = df.loc[df['photo_id'] == st.session_state.photo_id, 'longitude'].values[0]
+    return [lat, long]
+
 def init():
     st.session_state.init_flag = True
     st.session_state.user_name = ""
@@ -38,11 +45,14 @@ def init():
     st.session_state.zoom = 13
     st.session_state.guess_position = [0, 0]
     st.session_state.photo_id = get_photo_param()
-    st.session_state.photo_position = get_photo_position()
+    st.session_state.photo_position = read_photo_position()
+
+def init_database():
+    st.session_state.conn = st.connection("postgresql", type="sql")
 
 # Hauptfunktion
 def main():
-    st.title("KA-FotoFinder")
+    #st.title("KA-FotoFinder")
 
     if st.session_state.user_name:
         st.write(f"## Hallo {st.session_state.user_name}!")
@@ -59,8 +69,9 @@ if __name__ == "__main__":
         main()
     else:
         init_deviceMode()
+        init_database()
         init()
         st.rerun()
 
 # Output für Entwicklung
-st.write(st.session_state)
+#st.write(st.session_state)

@@ -75,8 +75,8 @@ def insert_data(username, timestamp, distance, photo_id):
     st.success("Data inserted successfully!")
 
 def main():
-    #st.title("quiz")
-    st.write("### Ort auswählen und bestätigen")
+    st.title("KA-FotoFinder")
+    st.write("Ort auswählen und bestätigen")
 
     # Karte Initial erstellen
     map_output = generate_map_new()

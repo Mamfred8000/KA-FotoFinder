@@ -54,8 +54,9 @@ def init_database():
 
 # Hauptfunktion
 def main():
-    #st.title("KA-FotoFinder")
-
+    st.title("KA-FotoFinder")
+    st.write("Das Ziel ist, den Aufnahmeort des Fotos möglichst genau zu treffen. Viel Spaß!")
+    
     if st.session_state.user_name:
         st.write(f"## Hallo {st.session_state.user_name}!")
         if st.button("Starten", type="primary"): st.switch_page("pages/1_quiz.py")

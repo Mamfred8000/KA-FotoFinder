@@ -2,6 +2,8 @@ import time
 import streamlit as st
 from streamlit import runtime
 from streamlit_javascript import st_javascript
+import requests
+from datetime import datetime
 
 def init_deviceMode():
     user_agent = st_javascript("window.navigator.userAgent")
@@ -43,6 +45,7 @@ def read_photo_position():
 def init():
     st.session_state.init_flag = True
     st.session_state.user_name = ""
+    st.session_state.lastTryToday_flag = False
     st.session_state.marker_pos = [49.01357217893837, 8.404385447502138]
     st.session_state.zoom = 13
     st.session_state.guess_position = [0, 0]
@@ -52,16 +55,42 @@ def init():
 def init_database():
     st.session_state.conn = st.connection("postgresql", type="sql")
 
+def register_user():
+    try:
+        st.session_state.device_id = requests.get("https://api64.ipify.org").text
+    except:
+        return None
+    
+    query = 'SELECT * FROM "KAFotoFinder-Scoreboard" WHERE device_id = :device_id;'
+    df = st.session_state.conn.query(
+        query,
+        ttl=5,
+        params = {"device_id" : st.session_state.device_id}
+        )
+    
+    if not df.empty:
+        st.session_state.user_name = df["username"].iloc[0]
+
+        df_photoID = df[df["photo_id"] == st.session_state.photo_id]
+        st.session_state.lastTryToday_flag = df_photoID["timestamp"].max() == datetime.now().date()
+
+
 # Hauptfunktion
 def main():
     st.title("KA-FotoFinder")
-    st.write("Das Ziel ist, den Aufnahmeort des Fotos möglichst genau zu treffen. Viel Spaß!")
-    
+    st.write("Das Ziel des Spiels ist, den Aufnahmeort des Fotos möglichst genau zu erraten.")
+    st.write("Dafür den QR-Code auf dem Foto scannen und dann auf der Karte den potenitellen Ort anklicken.")
+    st.write("Viel Spaß! Grüße, Moritz")
     if st.session_state.user_name:
         st.write(f"## Hallo {st.session_state.user_name}!")
-        if st.button("Starten", type="primary"): st.switch_page("pages/1_quiz.py")
+        if not st.session_state.lastTryToday_flag:
+            st.write("Viel Spaß beim raten!")
+            if st.button("Starten", type="primary"): st.switch_page("pages/1_quiz.py")
+        else:
+            st.write("Du hast leider heute für dieses Foto schon geraten.")
+            st.write("Versuche doch ein anderes Foto!")
     else:
-        st.write("## Neu hier...?")
+        st.write("### Neu hier...? Erstmal anmelden!")
         name = st.text_input("Wie heißt du?", placeholder="Name")
         if name:
             st.session_state.user_name = name
@@ -74,6 +103,7 @@ if __name__ == "__main__":
         init_deviceMode()
         init_database()
         init()
+        register_user()
         st.rerun()
 
 # Output für Entwicklung

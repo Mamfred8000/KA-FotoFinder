@@ -2,8 +2,7 @@ import streamlit as st
 import folium
 from streamlit_folium import st_folium
 from geopy.distance import geodesic
-
-from datetime import date
+from datetime import datetime
 from sqlalchemy import text
 import time
 
@@ -52,12 +51,12 @@ def calculate_distance():
     st.session_state.distance = geodesic(guess, goal).meters
     return True
 
-def insert_data(username, timestamp, distance, photo_id):
+def insert_data(username, timestamp, distance, photo_id, device_id):
     #conn = st.connection("postgresql", type="sql")
     
     insert_query = text(
-        'INSERT INTO "KAFotoFinder-Scoreboard" (username, timestamp, distance, photo_id) '
-        'VALUES (:username, :timestamp, :distance, :photo_id)'
+        'INSERT INTO "KAFotoFinder-Scoreboard" (username, timestamp, distance, photo_id, device_id) '
+        'VALUES (:username, :timestamp, :distance, :photo_id, :device_id)'
     )
     
     # Execute the insert query with a progress spinner
@@ -67,7 +66,8 @@ def insert_data(username, timestamp, distance, photo_id):
                 'username': username,
                 'timestamp': timestamp,
                 'distance': distance,
-                'photo_id': photo_id
+                'photo_id': photo_id,
+                'device_id': device_id
             })
             s.commit()
             #time.sleep(4)  #Latency of database is 1-4 seconds
@@ -92,9 +92,10 @@ def main():
         calculate_distance()
         insert_data(
             st.session_state.user_name,
-            date.today(),
+            datetime.now(),
             st.session_state.distance,
-            st.session_state.photo_id
+            st.session_state.photo_id,
+            st.session_state.device_id
         )
         st.switch_page("pages/2_result.py")
 

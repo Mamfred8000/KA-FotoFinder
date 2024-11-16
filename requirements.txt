@@ -7,3 +7,4 @@ streamlit_javascript
 geopy
 sqlalchemy
 psycopg2-binary
+requests

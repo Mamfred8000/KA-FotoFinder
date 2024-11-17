@@ -5,6 +5,7 @@ from geopy.distance import geodesic
 from datetime import datetime
 from sqlalchemy import text
 import time
+from streamlit_cookies_manager import EncryptedCookieManager
 
 # Karte erzeugen
 def generate_map():
@@ -95,7 +96,7 @@ def main():
             datetime.now(),
             st.session_state.distance,
             st.session_state.photo_id,
-            st.session_state.device_id
+            st.session_state.user_agent
         )
         st.switch_page("pages/2_result.py")
 

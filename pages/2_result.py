@@ -1,6 +1,8 @@
 import streamlit as st
 import folium
 from streamlit_folium import st_folium
+from datetime import datetime
+import pandas as pd
 
 def generate_map_new():
     """Karsste mit Marker erzeugen nach der neuen Methode. Die Hoffnung war, dadurch eine dynamische Karte ohne Rerendern zu erzeugen."""
@@ -59,18 +61,72 @@ def generate_map_new():
     
     return map_output
 
+def query_highscore_list():
+    query = 'SELECT * FROM "KAFotoFinder-Scoreboard" WHERE photo_id = :photo_id;'
+    df = st.session_state.conn.query(
+        query,
+        ttl=5,
+        params = {"photo_id" : st.session_state.photo_id}
+        )
+    
+    return df
+
+def update_highscore_list():
+    """Manuelles Update mit dem neuen Wert, um nicht auf Latenz der Datenbank angewiesen zu sein"""
+    
+    ### Highscore Liste abrufen und auf bestes Ergebnis pro Spieler filtern
+    df = query_highscore_list()
+    df['new_flag'] = "old"
+    df_unique = df.loc[df.groupby('username')['distance'].idxmin()]
+
+    ### Neuen Versuch eintragen
+    new_entry = pd.DataFrame({'username': st.session_state.user_name,
+                              'timestamp': datetime.now().date(),
+                              'distance': st.session_state.distance,
+                              'photo_id': st.session_state.photo_id,
+                              'device_id': [None],
+                              'new_flag': "new"
+                              })
+
+    df_updated = pd.concat([df_unique, new_entry], ignore_index=True)
+
+    ### Formatieren
+    df_renamed = df_updated.rename(columns={'username': 'Name', 'timestamp': 'Zeit', 'distance': 'Score'})
+    df_sorted = df_renamed.sort_values(by='Score', ascending=True)
+    df_sorted['Platz'] = range(1, len(df_sorted) + 1)
+    df_sorted = df_sorted[['Platz', 'Name', 'Zeit', 'Score', 'new_flag']]
+
+    st.session_state.highscore_list = df_sorted
+
+
 def calculate_rank():
-    st.session_state.rank = 1
+    df = st.session_state.highscore_list
+    filtered_df = df[df['new_flag'] == 'new']
+    min_score_index = filtered_df['Score'].idxmin()
+    platz_min_score = filtered_df.loc[min_score_index, 'Platz']
+    st.session_state.rank = platz_min_score
+
+def print_highscore():
+    df = st.session_state.highscore_list
+    df['Score'] = df['Score'].astype(int)
+    styled_df = df.style.apply(
+        lambda row: ['font-weight: bold; background-color: red' if row['new_flag'] == 'new' else '' for _ in row],
+        axis=1  # Zeilenweise anwenden
+    )
+    st.dataframe(styled_df, hide_index=True, column_order=("Platz", "Name", "Zeit", "Score"))
 
 def main():
-    #st.title("result")
-    
+    update_highscore_list()
     calculate_rank()
 
     st.markdown(f"<h2 style='text-align: center;'>{st.session_state.distance:.0f}m</h2>", unsafe_allow_html=True)
-    st.markdown(f"<p style='text-align: center;'>Super, {st.session_state.rank}. Platz für dich!</p>", unsafe_allow_html=True)
+    st.markdown(f"<p style='text-align: center;'>{st.session_state.rank}. Platz für dich!</p>", unsafe_allow_html=True)
 
+    st.write("### Dein Score:")
     map_obj = generate_map_new()
+
+    st.write("### Highscore Liste:")
+    print_highscore()
 
 ##main
 if 'init_flag' in st.session_state:

@@ -94,7 +94,7 @@ def main():
             datetime.now(),
             st.session_state.distance,
             st.session_state.photo_id,
-            st.session_state.user_agent
+            "dummy"
         )
         st.switch_page("pages/2_result.py")
 

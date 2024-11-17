@@ -1,6 +1,7 @@
 import time
 import streamlit as st
 from streamlit_javascript import st_javascript
+import streamlit.components.v1 as components
 
 def init_deviceMode():
     user_agent = st_javascript("window.navigator.userAgent")
@@ -10,7 +11,6 @@ def init_deviceMode():
     while True:
         if isinstance(user_agent, str):
             st.session_state.device_mode = "mobile" if "Mobi" in user_agent else "desktop"
-            st.session_state.user_agent=(user_agent)
             break
         elif time.time() - start_time > timeout:
             st.write("Timeout feching javascript data reached; exiting loop.")
@@ -70,7 +70,7 @@ def main():
         st.write("Viel Spaß beim raten!")
         if st.button("Starten", type="primary"): st.switch_page("pages/1_quiz.py")
     else:
-        st.write("### Neu hier...? Erstmal anmelden!")
+        st.write("### Wie heißt du?")
         name = st.text_input("Wie heißt du?", placeholder="Name")
         if name:
             st.session_state.user_name = name

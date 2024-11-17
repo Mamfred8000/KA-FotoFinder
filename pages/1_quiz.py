@@ -4,8 +4,6 @@ from streamlit_folium import st_folium
 from geopy.distance import geodesic
 from datetime import datetime
 from sqlalchemy import text
-import time
-from streamlit_cookies_manager import EncryptedCookieManager
 
 # Karte erzeugen
 def generate_map():

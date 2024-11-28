@@ -27,7 +27,7 @@ def main():
     st.write("Dafür den QR-Code auf dem Foto scannen und dann auf der Karte den potenitellen Ort anklicken.")
     st.write("Viel Spaß! Grüße, Moritz")
     if st.session_state.user_name:
-        st.write("Viel Spaß beim raten!")
+        st.write("## Viel Spaß beim raten!")
         if st.button("Starten", type="primary"): st.switch_page("pages/1_quiz.py")
     else:
         st.write("### Wie heißt du?")

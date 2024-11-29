@@ -15,7 +15,7 @@ def query_highscore_list():
     return df
 
 def query_photo_position():
-    df = st.session_state.conn.query('SELECT * FROM "photo-list";')
+    df = st.session_state.conn.query('SELECT * FROM "photo-list";', ttl=0)
     if st.session_state.photo_id in df['photo_id'].values:
         lat = df.loc[df['photo_id'] == st.session_state.photo_id, 'latitude'].values[0]
         long = df.loc[df['photo_id'] == st.session_state.photo_id, 'longitude'].values[0]
